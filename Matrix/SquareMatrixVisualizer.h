@@ -32,10 +32,8 @@ namespace Matrix
 		template< template<class> class MatrixType, typename ElementType, typename AreaFunction >
 		void PrintElementOfArea(
 			MatrixType<ElementType> &mtx,
-			AreaFunction areaFunc, 
-			char const* ansiColorOfArea, 
-			Element<ElementType> element,
-			char const* ansiColorOfElement 
+			AreaFunction areaFunc, char const* ansiColorOfArea, 
+			Element<ElementType> element, char const* ansiColorOfElement 
 		);
 
 		template<typename AreaFunction>
@@ -63,6 +61,62 @@ namespace Matrix
 						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]); 
 					}
 					else if (isInAreaToColor( current ))
+					{
+						printf("%s", ansiColorOfArea);
+						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
+					}
+					else
+					{
+						printf("%s", Log::ansiColorReset);
+						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
+					}
+
+					printf("%s", Log::ansiColorReset);
+				}
+				printf(" |\n");
+			}
+		}
+
+		template< template<class> class MatrixType, typename ElementType, typename AreaFunction >
+		void PrintElementOfArea(
+			MatrixType<ElementType> &mtx,
+			AreaFunction areaFunc, char const* ansiColorOfArea,
+			Element<ElementType> element, char const* ansiColorOfElement,
+			Element<int> elementToColor2, char const * ansiColorOfElement2
+		);
+
+
+		template<typename AreaFunction>
+		void PrintElementOfArea(SquareMatrix<int>& mtx, AreaFunction isInAreaToColor, char const * ansiColorOfArea, Element<int> elementToColor, char const * ansiColorOfElement, Element<int> elementToColor2, char const * ansiColorOfElement2)
+		{
+			if (_isMatrixChanged)
+			{
+				_RecalculateNumberOfDigitsInMaxElement(mtx);
+				_isMatrixChanged = false;
+			}
+
+			size_t order = mtx.GetOrder();
+			printf("Matrix %ux%u:\n", order, order);
+			for (int i = 0; i < order; ++i)
+			{
+				printf("| ");
+				for (int j = 0; j < order; ++j)
+				{
+					Element<int> current = { i, j, &mtx[i][j] };
+
+					if (elementToColor.column == current.column
+						&& elementToColor.row == current.row)
+					{
+						printf("%s", ansiColorOfElement);
+						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
+					}
+					else if (elementToColor2.column == current.column
+						&& elementToColor2.row == current.row)
+					{
+						printf("%s", ansiColorOfElement2);
+						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
+					}
+					else if (isInAreaToColor(current))
 					{
 						printf("%s", ansiColorOfArea);
 						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);

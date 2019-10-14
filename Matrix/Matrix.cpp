@@ -13,7 +13,7 @@
 #include "SquareMatrixVisualizer.h"
 #include "Log.h"
 
-#include "MatrixAlgorithm.h"
+#include "MatrixAlgorithmVisualization.h"
 
 
 size_t GetMatrixOrderFromUser()
@@ -72,32 +72,27 @@ int main(int argc, char *argv[])
 
 	RandomElements(mtx);
 
-	Matrix::MatrixVisualizer visuzlizer;
-	visuzlizer.Print(mtx);
+	Matrix::MatrixVisualizer visualizer;
+	visualizer.Print(mtx);
 
 	system("pause");
 	system("cls");
 
 	auto elementsUpperSideDiagonalFunction = [&mtx](Matrix::Element<int> &elem)
 	{
-		return elem.column >= (mtx.GetOrder() - elem.row);
+		return elem.column < (mtx.GetOrder() - elem.row);
 	};
 
-	auto maxElem = Matrix::Algorithm::FindElement(
+	auto maxElem = Matrix::Algorithm::Visualization::FindElement(
 		mtx, 
 		elementsUpperSideDiagonalFunction,
+		Log::ansiColorYellow,
 		[](Matrix::Element<int> &last, Matrix::Element<int> &second)
 		{
 			return (*last.value) < (*second.value);
-		}
-	);
-
-	visuzlizer.PrintElementOfArea(
-		mtx,
-		elementsUpperSideDiagonalFunction,
-		Log::ansiColorYellow,
-		maxElem,
-		Log::ansiColorGreen
+		},
+		Log::ansiColorGreen,
+		Log::ansiColorRed
 	);
 
 	printf("%sMax element upper side diagonal is:\nmtx[%i][%i] == %i\n", Log::ansiColorGreen, maxElem.row, maxElem.column, *maxElem.value);
