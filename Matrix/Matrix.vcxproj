@@ -155,6 +155,7 @@
     <ClInclude Include="Array.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MatrixAlgorithm.h" />
+    <ClInclude Include="MatrixElement.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SquareMatrix.h" />
     <ClInclude Include="SquareMatrixVisualizer.h" />

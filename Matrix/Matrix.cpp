@@ -76,17 +76,28 @@ int main(int argc, char *argv[])
 	visuzlizer.Print(mtx);
 
 	system("pause");
+	system("cls");
+
+	auto elementsUpperSideDiagonalFunction = [&mtx](Matrix::Element<int> &elem)
+	{
+		return elem.column >= (mtx.GetOrder() - elem.row);
+	};
 
 	auto maxElem = Matrix::Algorithm::FindElement(
 		mtx, 
-		[&mtx](Matrix::Element<int> &elem) 
-		{
-			return elem.column < (mtx.GetOrder() - elem.row);
-		},
+		elementsUpperSideDiagonalFunction,
 		[](Matrix::Element<int> &last, Matrix::Element<int> &second)
 		{
 			return (*last.value) < (*second.value);
 		}
+	);
+
+	visuzlizer.PrintElementOfArea(
+		mtx,
+		elementsUpperSideDiagonalFunction,
+		Log::ansiColorYellow,
+		maxElem,
+		Log::ansiColorGreen
 	);
 
 	printf("%sMax element upper side diagonal is:\nmtx[%i][%i] == %i\n", Log::ansiColorGreen, maxElem.row, maxElem.column, *maxElem.value);
