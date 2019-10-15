@@ -6,9 +6,18 @@
 #include "Log.h"
 #include <stdio.h>
 
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 namespace Matrix
 {
-
+	template<typename ValueType>
+	struct ElementToVisualize
+	{
+		Element<ValueType> element;
+		char const * ansiColorOfElement;
+	};
 	class MatrixVisualizer
 	{
 		size_t _numberOfDigitsInMaxElement;
@@ -29,108 +38,65 @@ namespace Matrix
 		template< template<class> class MatrixType, typename ElementType > 
 		void Print(MatrixType<ElementType> &mtx);
 
+		// Требует предварительного использования print в пустой консоли
 		template< template<class> class MatrixType, typename ElementType, typename AreaFunction >
-		void PrintElementOfArea(
-			MatrixType<ElementType> &mtx,
-			AreaFunction areaFunc, char const* ansiColorOfArea, 
-			Element<ElementType> element, char const* ansiColorOfElement 
-		);
-
-		template<typename AreaFunction>
-		void PrintElementOfArea(SquareMatrix<int>& mtx, AreaFunction isInAreaToColor, char const * ansiColorOfArea, Element<int> elementToColor, char const * ansiColorOfElement)
-		{
-			if (_isMatrixChanged)
-			{
-				_RecalculateNumberOfDigitsInMaxElement(mtx);
-				_isMatrixChanged = false;
-			}
-
-			size_t order = mtx.GetOrder();
-			printf("Matrix %ux%u:\n", order, order);
-			for (int i = 0; i < order; ++i)
-			{
-				printf("| ");
-				for (int j = 0; j < order; ++j)
-				{
-					Element<int> current = { i, j, &mtx[i][j] };
-
-					if (elementToColor.column == current.column
-						&& elementToColor.row == current.row)
-					{
-						printf("%s", ansiColorOfElement);
-						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]); 
-					}
-					else if (isInAreaToColor( current ))
-					{
-						printf("%s", ansiColorOfArea);
-						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
-					}
-					else
-					{
-						printf("%s", Log::ansiColorReset);
-						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
-					}
-
-					printf("%s", Log::ansiColorReset);
-				}
-				printf(" |\n");
-			}
-		}
-
-		template< template<class> class MatrixType, typename ElementType, typename AreaFunction >
-		void PrintElementOfArea(
+		void Update(
 			MatrixType<ElementType> &mtx,
 			AreaFunction areaFunc, char const* ansiColorOfArea,
-			Element<ElementType> element, char const* ansiColorOfElement,
-			Element<int> elementToColor2, char const * ansiColorOfElement2
+			Array<ElementToVisualize<ElementType>> elements
 		);
-
-
 		template<typename AreaFunction>
-		void PrintElementOfArea(SquareMatrix<int>& mtx, AreaFunction isInAreaToColor, char const * ansiColorOfArea, Element<int> elementToColor, char const * ansiColorOfElement, Element<int> elementToColor2, char const * ansiColorOfElement2)
+		void Update(SquareMatrix<int>& mtx, AreaFunction isInAreaToColor, char const * ansiColorOfArea, Array<ElementToVisualize<int>> &elements)
 		{
-			if (_isMatrixChanged)
-			{
-				_RecalculateNumberOfDigitsInMaxElement(mtx);
-				_isMatrixChanged = false;
-			}
+			static const HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+			CONSOLE_SCREEN_BUFFER_INFO consolescreenBufferInfo;
+			GetConsoleScreenBufferInfo(out, &consolescreenBufferInfo);
+
+			COORD elementBegin = { 0,0 };
+			COORD sourcePos = { consolescreenBufferInfo.dwCursorPosition.X, consolescreenBufferInfo.dwCursorPosition.Y };
 
 			size_t order = mtx.GetOrder();
-			printf("Matrix %ux%u:\n", order, order);
 			for (int i = 0; i < order; ++i)
 			{
-				printf("| ");
+				elementBegin.X = 2; // skip "| "
+				SetConsoleCursorPosition(out, elementBegin);
 				for (int j = 0; j < order; ++j)
 				{
 					Element<int> current = { i, j, &mtx[i][j] };
 
-					if (elementToColor.column == current.column
-						&& elementToColor.row == current.row)
+					bool isElementAredyColored = false;
+					auto elementsCount = elements.GetSize();
+					for (int elementId = 0; elementId < elementsCount; ++elementId)
 					{
-						printf("%s", ansiColorOfElement);
-						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
+						auto candidate = elements[elementId].element;
+						if (candidate.column == current.column
+							&& candidate.row == current.row)
+						{
+							printf("%s%*i ", elements[elementId].ansiColorOfElement, _numberOfDigitsInMaxElement, mtx[i][j]);
+							isElementAredyColored = true;
+							break;
+						}
 					}
-					else if (elementToColor2.column == current.column
-						&& elementToColor2.row == current.row)
+
+					if (!isElementAredyColored)
 					{
-						printf("%s", ansiColorOfElement2);
-						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
-					}
-					else if (isInAreaToColor(current))
-					{
-						printf("%s", ansiColorOfArea);
-						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
-					}
-					else
-					{
-						printf("%s", Log::ansiColorReset);
-						printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
+						if (isInAreaToColor(current))
+						{
+							printf("%s%*i ", ansiColorOfArea, _numberOfDigitsInMaxElement, mtx[i][j]);
+						}
+						else
+						{
+							printf("%*i ", _numberOfDigitsInMaxElement, mtx[i][j]);
+						}
 					}
 
 					printf("%s", Log::ansiColorReset);
+
+					elementBegin.X += _numberOfDigitsInMaxElement;
 				}
-				printf(" |\n");
+				elementBegin.Y += 1;// go to next row
 			}
+			SetConsoleCursorPosition(out, sourcePos);
 		}
 	private:
 		template< template<class> class MatrixType, typename ElementType >
@@ -165,8 +131,8 @@ namespace Matrix
 			_isMatrixChanged = false;
 		}
 
-		size_t order = mtx.GetOrder();
-		printf("Matrix %ux%u:\n", order, order);
+		auto order = mtx.GetOrder();
+
 		for (int i = 0; i < order; ++i)
 		{
 			printf("| ");

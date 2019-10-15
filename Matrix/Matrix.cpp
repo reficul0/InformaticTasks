@@ -73,7 +73,15 @@ int main(int argc, char *argv[])
 	RandomElements(mtx);
 
 	Matrix::MatrixVisualizer visualizer;
+
+	size_t order = mtx.GetOrder();
+	printf("Matrix %ux%u:\n", order, order);
 	visualizer.Print(mtx);
+
+	size_t timeoutBetweenSteps;
+	printf("\nEnter timeout between steps(msec): ");
+	scanf("%u", &timeoutBetweenSteps);
+	printf("\n");
 
 	system("pause");
 	system("cls");
@@ -92,7 +100,8 @@ int main(int argc, char *argv[])
 			return (*last.value) < (*second.value);
 		},
 		Log::ansiColorGreen,
-		Log::ansiColorRed
+		Log::ansiColorRed,
+		timeoutBetweenSteps
 	);
 
 	printf("%sMax element upper side diagonal is:\nmtx[%i][%i] == %i\n", Log::ansiColorGreen, maxElem.row, maxElem.column, *maxElem.value);

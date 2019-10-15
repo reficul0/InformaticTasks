@@ -20,6 +20,11 @@ public:
 		_Delete();
 	}
 
+	size_t GetSize()
+	{
+		return _size;
+	}
+
 	ElementType& operator[](size_t elementId)
 	{
 		return _ptr[elementId];

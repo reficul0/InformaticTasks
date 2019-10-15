@@ -21,7 +21,8 @@ namespace Matrix
 				char const * ansiColorOfArea,
 				CompareFunction const &compare,
 				char const * currentElementColor,
-				char const * candidateColor
+				char const * candidateColor,
+				size_t timeoutBetweenSteps
 			)
 			{
 				size_t order = mtx.GetOrder();
@@ -29,6 +30,14 @@ namespace Matrix
 				bool isFirst = true;
 
 				MatrixVisualizer visualizer;
+				Array<ElementToVisualize<int>> elements(2);
+				elements[0].ansiColorOfElement = currentElementColor;
+				elements[1].ansiColorOfElement = candidateColor;
+
+				system("cls");
+				visualizer.Print(mtx);
+
+				printf("\nColors: %ssearch area, %scurrent element, %scandidate\n%s", ansiColorOfArea, currentElementColor, candidateColor, Log::ansiColorReset);
 
 				ForEach(mtx, [&](Element<ElementType> &candidate)
 				{
@@ -37,19 +46,18 @@ namespace Matrix
 						{
 							isFirst = false;
 							current = candidate;
+							elements[0].element = current;
 						}
 
-					system("cls");
-					visualizer.PrintElementOfArea(
+					elements[1].element = candidate;
+
+					visualizer.Update(
 						mtx,
 						isElementInArea,
 						ansiColorOfArea,
-						current,
-						currentElementColor,
-						candidate,
-						candidateColor
+						elements
 					);
-					Sleep(100);
+					Sleep(timeoutBetweenSteps);
 				});
 
 				return current;
