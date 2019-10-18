@@ -10,7 +10,7 @@
 #include <time.h>
 
 #include "SquareMatrix.h"
-#include "SquareMatrixVisualizer.h"
+#include "MatrixVisualizer.h"
 #include "Log.h"
 
 #include "MatrixAlgorithmVisualization.h"
@@ -58,7 +58,7 @@ void RandomElements(Matrix::SquareMatrix<int> &mtx)
 
 	size_t const order = mtx.GetOrder();
 
-	Matrix::Algorithm::ForEach(mtx, [&](Matrix::Element<int> &elem)
+	Matrix::Algorithm::ForEach(&mtx, [&](Matrix::Element<int> &elem)
 	{
 		*(elem.value) = isMinEqualsMax
 					? min
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
 	size_t order = mtx.GetOrder();
 	printf("Matrix %ux%u:\n", order, order);
-	visualizer.Print(mtx);
+	visualizer.Print(&mtx);
 
 	size_t timeoutBetweenSteps;
 	printf("\nEnter timeout between steps(msec): ");
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 	};
 
 	auto maxElem = Matrix::Algorithm::Visualization::FindElement(
-		mtx, 
+		&mtx, 
 		elementsUpperSideDiagonalFunction,
 		Log::ansiColorYellow,
 		[](Matrix::Element<int> &last, Matrix::Element<int> &second)
