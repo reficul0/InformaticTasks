@@ -62,7 +62,7 @@ namespace Matrix
 				SetConsoleCursorPosition(out, elementBegin);
 				for (int j = 0; j < order; ++j)
 				{
-					Element<int> current = { i, j, &mtx[i][j] };
+					Element<int> current( i, j, &mtx[i][j] );
 
 					bool isElementAredyColored = false;
 					auto elementsCount = elements.GetSize();
@@ -111,14 +111,19 @@ namespace Matrix
 
 		for (size_t i(0); i < order; ++i)
 			for (size_t j(0); j < order; ++j)
-				if (max == nullptr || mtx[i][j] > (*max))
+				if (max == nullptr || abs(mtx[i][j]) > abs(*max))
 					max = &mtx[i][j];
 
 		if (max == nullptr) // элементов нет
 			_numberOfDigitsInMaxElement = 0;
 		else
+		{
 			for (int tmpMax = *max; tmpMax; tmpMax /= 10)
 				++_numberOfDigitsInMaxElement;
+
+			if (*max < 0)
+				++_numberOfDigitsInMaxElement;
+		}
 
 	}
 

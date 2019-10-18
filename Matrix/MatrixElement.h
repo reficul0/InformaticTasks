@@ -9,6 +9,17 @@ namespace Matrix
 		size_t column;
 		ElementType *value = nullptr;
 
+
+		Element()
+		{
+		}
+		Element(size_t Row, size_t Column, ElementType *Value)
+			: row(Row)
+			, column(Column)
+			, value(Value)
+		{
+		}
+
 		Element operator=(Element other)
 		{
 			row = other.row;

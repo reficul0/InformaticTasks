@@ -19,7 +19,7 @@ namespace Matrix
 			for (size_t i(0); i < order; ++i)
 				for (size_t j(0); j < order; ++j)
 				{
-					Element<ElementType> element = { i, j, &mtx[i][j] };
+					Element<ElementType> element { i, j, &mtx[i][j] };
 					func(element);
 				}
 		}
