@@ -64,7 +64,12 @@ void RandomElements(MatrixType<ElementType> *mtx)
 int main(int argc, char *argv[])
 {
 	using ElementType = int;
-	Matrix::Matrix<ElementType> *mtx = new Matrix::SquareMatrix<ElementType>( Matrix::Tools::GetMatrixOrderFromUser() );
+	Matrix::Matrix<ElementType>* mtx = new Matrix::SquareMatrix<ElementType>(
+		Matrix::Tools::GetValueFromUser<int64_t>(
+			"Enter the order of the matrix > 0",
+			[](int64_t value) { return value > 0; }
+		)
+	);
 
 	if (mtx != nullptr)
 	{

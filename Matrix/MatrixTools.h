@@ -10,11 +10,12 @@ namespace Matrix
 {
 	namespace Tools
 	{
-		size_t GetSizeValueFromUser(const char* message)
+		template<typename ValueType, typename IsValueValidFunction>
+		ValueType GetValueFromUser(const char* message, IsValueValidFunction isValueValid)
 		{
 			using namespace std;
 
-			int64_t value = 0;
+			ValueType value = 0;
 			bool isValueInvalid = true;
 
 			while (isValueInvalid)
@@ -22,9 +23,8 @@ namespace Matrix
 				cout << message << ": ";
 				cin >> value;
 
-				bool isStreamInFailureState = cin.fail(),
-					isValuePositive = value > 0;
-				isValueInvalid = isStreamInFailureState || !isValuePositive;
+				bool isStreamInFailureState = cin.fail();
+				isValueInvalid = isStreamInFailureState || !isValueValid(value);
 
 				if (isValueInvalid)
 				{
@@ -38,10 +38,6 @@ namespace Matrix
 			system("cls");
 
 			return value;
-		}
-		size_t GetMatrixOrderFromUser()
-		{
-			return GetSizeValueFromUser("Enter the order of the matrix");
 		}
 	}
 }
