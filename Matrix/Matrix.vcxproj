@@ -24,7 +24,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Matrix</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -154,14 +154,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="Demonstrarion.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixAlgorithm.h" />
     <ClInclude Include="MatrixAlgorithmVisualization.h" />
     <ClInclude Include="MatrixElement.h" />
+    <ClInclude Include="MatrixTools.h" />
+    <ClInclude Include="MatrixVisualizer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SquareMatrix.h" />
-    <ClInclude Include="SquareMatrixVisualizer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Matrix.cpp" />

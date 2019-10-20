@@ -18,7 +18,7 @@ namespace Matrix
 				bool isFirst = true;
 
 				MatrixVisualizer visualizer;
-				Array<ElementToVisualize<int>> elements(2);
+				Array<ElementToVisualize<ElementType>> elements(2);
 				elements[0].ansiColorOfElement = currentElementColor;
 				elements[1].ansiColorOfElement = candidateColor;
 

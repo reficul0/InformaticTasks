@@ -81,7 +81,7 @@ namespace Matrix
 				SetConsoleCursorPosition(out, elementBegin);
 				for (int j = 0; j < columns; ++j)
 				{
-					Element<int> current(i, j, &(*mtxPtr)[i][j]);
+					Element<ElementType> current(i, j, &(*mtxPtr)[i][j]);
 
 					bool isElementAredyColored = false;
 					auto elementsCount = elements.GetSize();
@@ -124,7 +124,7 @@ namespace Matrix
 			size_t rows = mtx->GetRows();
 			size_t columns = mtx->GetColumns();
 
-			int *max = nullptr;
+			ElementType *max = nullptr;
 
 			for (size_t i(0); i < rows; ++i)
 				for (size_t j(0); j < columns; ++j)
@@ -135,7 +135,7 @@ namespace Matrix
 				_numberOfDigitsInMaxElement = 0;
 			else
 			{
-				for (int tmpMax = *max; tmpMax; tmpMax /= 10)
+				for (ElementType tmpMax = *max; tmpMax; tmpMax /= 10)
 					++_numberOfDigitsInMaxElement;
 
 				if (*max < 0)

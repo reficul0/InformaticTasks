@@ -11,13 +11,13 @@ namespace Matrix
 	{
 	public:
 		SquareMatrix(size_t mtxOrder)
-			: Matrix(mtxOrder, mtxOrder)
+			: Matrix<ElementType>(mtxOrder, mtxOrder)
 		{
 		}
 
 		size_t GetOrder()
 		{
-			return Matrix::_rows;
+			return Matrix<ElementType>::_rows;
 		}
 	};
 }
