@@ -27,7 +27,7 @@ namespace Demostration
 
 			auto elementsUpperSideDiagonalFunction = [mtx](Matrix::Element<ElementType>& elem)
 			{
-				return elem.column < (mtx->GetRows() - elem.row);
+				return elem.column >= elem.row;
 			};
 			auto maxElementFunction = [](Matrix::Element<ElementType>& last, Matrix::Element<ElementType>& second)
 			{
