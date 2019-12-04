@@ -10,6 +10,8 @@
 #include <ctime>
 #include <iterator>
 
+// Вариант 10.
+
 template<typename ContainerT>
 double GetA8(ContainerT const &container)
 {
