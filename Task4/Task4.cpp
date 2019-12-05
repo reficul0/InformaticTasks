@@ -22,45 +22,45 @@
 âàêàíòíûå ìåñòà ïî çàäàííîìó óçêîìó ñïåöèàëèñòó.
 */
 
-class Ñlinic
+class Clinic
 {
 public:
 	using EmployeesT = std::map<std::string/*vacancy name*/, size_t/*specialists count*/>;
 
-	template<typename InEmployeesT>
-	Ñlinic(std::string const &number, InEmployeesT &&employees)
-		: Number(std::move(number))
+	template<typename StringT, typename InEmployeesT>
+	Clinic(StringT &&name, InEmployeesT &&employees)
+		: Name(std::forward<StringT>(name))
 		, Employees(std::forward<InEmployeesT>(employees))
 	{
 	}
 
-	std::string Number;
+	std::string Name;
 	EmployeesT Employees;
 };
 
-class TransferÑlinic {
+class TransferClinic {
 public:
-	friend std::istream &operator >> (std::istream &in, TransferÑlinic &dest)
+	friend std::istream &operator >> (std::istream &in, TransferClinic &dest)
 	{
-		in >> dest.number;
+		in >> dest.name;
 
 		while (!in.eof() && (in.peek() != '\n'))
 		{
-			Ñlinic::EmployeesT::key_type employeeSpecialization;
-			Ñlinic::EmployeesT::value_type::second_type employeesCount(0);
+			Clinic::EmployeesT::key_type employeeSpecialization;
+			Clinic::EmployeesT::value_type::second_type employeesCount(0);
 			in >> employeeSpecialization >> employeesCount;
 			dest.employees.emplace(std::move(employeeSpecialization), employeesCount);
 		}
 		return in;
 	}
 
-	operator Ñlinic() const {
-		return Ñlinic( std::move(number), std::move(employees) );
+	operator Clinic() const {
+		return Clinic( std::move(name), std::move(employees) );
 	}
 
 private:
-	std::string number;
-	Ñlinic::EmployeesT mutable employees;
+	std::string name;
+	Clinic::EmployeesT mutable employees;
 };
 
 int main()
@@ -68,7 +68,7 @@ int main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	std::vector<Ñlinic> clinics;
+	std::vector<Clinic> clinics;
 
 	std::ifstream file("input.txt", std::ifstream::in);
 	if (!file.is_open())
@@ -78,7 +78,7 @@ int main()
 		return -1;
 	}
 
-	std::copy(std::istream_iterator<TransferÑlinic>(file), std::istream_iterator<TransferÑlinic>(), std::back_inserter(clinics));
+	std::copy(std::istream_iterator<TransferClinic>(file), std::istream_iterator<TransferClinic>(), std::back_inserter(clinics));
 
 	std::string specialistName;
 	std::cout << "Enter any specialization name: ";
@@ -89,7 +89,7 @@ int main()
 	{
 		auto const &employee = clinic.Employees.find(specialistName);
 		if (employee == clinic.Employees.cend() || employee->second == 0)
-			thereAreVacancyIsOpen.push_back(clinic.Number);
+			thereAreVacancyIsOpen.push_back(clinic.Name);
 	};
 
 	if (!thereAreVacancyIsOpen.empty())
