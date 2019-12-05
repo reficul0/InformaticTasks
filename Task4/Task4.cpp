@@ -47,8 +47,9 @@ public:
 		while (!in.eof() && (in.peek() != '\n'))
 		{
 			Ñlinic::EmployeesT::key_type employeeSpecialization;
-			in >> employeeSpecialization;
-			dest.employees.emplace(std::move(employeeSpecialization), 1);
+			Ñlinic::EmployeesT::value_type::second_type employeesCount(0);
+			in >> employeeSpecialization >> employeesCount;
+			dest.employees.emplace(std::move(employeeSpecialization), employeesCount);
 		}
 		return in;
 	}
@@ -68,9 +69,8 @@ int main()
 	SetConsoleOutputCP(1251);
 
 	std::vector<Ñlinic> clinics;
-	std::ifstream file;
-	file.open("input.txt", std::ifstream::in);
 
+	std::ifstream file("input.txt", std::ifstream::in);
 	if (!file.is_open())
 	{ 
 		std::cout << "An error occurred while opening a file \"" << std::experimental::filesystem::current_path() << "\\input.txt\"\n";
@@ -84,15 +84,18 @@ int main()
 	std::cout << "Enter any specialization name: ";
 	std::cin >> specialistName;
 
-	std::vector<std::string> thereIsVacancyOpen;
+	std::vector<std::string> thereAreVacancyIsOpen;
 	for (auto const& clinic : clinics)
-		if (clinic.Employees.find(specialistName) == clinic.Employees.end())
-			thereIsVacancyOpen.push_back(clinic.Number);
-
-	if (!thereIsVacancyOpen.empty())
 	{
-		std::cout << "\nThere is a vacancies in clinics(" << thereIsVacancyOpen.size() << "): \n";
-		std::copy(thereIsVacancyOpen.cbegin(), thereIsVacancyOpen.cend(), std::ostream_iterator<decltype(*thereIsVacancyOpen.cbegin())>(std::cout, "\n"));
+		auto const &employee = clinic.Employees.find(specialistName);
+		if (employee == clinic.Employees.cend() || employee->second == 0)
+			thereAreVacancyIsOpen.push_back(clinic.Number);
+	};
+
+	if (!thereAreVacancyIsOpen.empty())
+	{
+		std::cout << "\nThere is a vacancies in clinics(" << thereAreVacancyIsOpen.size() << " of " << clinics.size() << "): \n";
+		std::copy(thereAreVacancyIsOpen.cbegin(), thereAreVacancyIsOpen.cend(), std::ostream_iterator<decltype(*thereAreVacancyIsOpen.cbegin())>(std::cout, "\n"));
 		std::cout << "\n";
 	}
 	else
