@@ -84,18 +84,18 @@ int main()
 	std::cout << "Enter any specialization name: ";
 	std::cin >> specialistName;
 
-	std::vector<std::string> thereAreVacancyIsOpen;
+	std::vector<std::string> thereAreIsOpenedVacancy;
 	for (auto const& clinic : clinics)
 	{
 		auto const &employee = clinic.Employees.find(specialistName);
 		if (employee == clinic.Employees.cend() || employee->second == 0)
-			thereAreVacancyIsOpen.push_back(clinic.Name);
+			thereAreIsOpenedVacancy.push_back(clinic.Name);
 	};
 
-	if (!thereAreVacancyIsOpen.empty())
+	if (!thereAreIsOpenedVacancy.empty())
 	{
-		std::cout << "\nThere is a vacancies in clinics(" << thereAreVacancyIsOpen.size() << " of " << clinics.size() << "): \n";
-		std::copy(thereAreVacancyIsOpen.cbegin(), thereAreVacancyIsOpen.cend(), std::ostream_iterator<decltype(*thereAreVacancyIsOpen.cbegin())>(std::cout, "\n"));
+		std::cout << "\nThere is a vacancies in clinics(" << thereAreIsOpenedVacancy.size() << " of " << clinics.size() << "): \n";
+		std::copy(thereAreIsOpenedVacancy.cbegin(), thereAreIsOpenedVacancy.cend(), std::ostream_iterator<decltype(*thereAreIsOpenedVacancy.cbegin())>(std::cout, "\n"));
 		std::cout << "\n";
 	}
 	else
