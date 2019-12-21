@@ -62,7 +62,8 @@ struct GraphInfo
 template<typename GraphT>
 void PrintGraph(GraphT const &graph, GraphInfo<GraphT> const &graphInfo)
 {
-	size_t const numbersInDiameterVal = std::log10(graphInfo.diameter) + 1,
+	bool constexpr canValueBeNegative = true;
+	size_t const numbersInDiameterVal = std::log10(graphInfo.diameter) + 1 + canValueBeNegative,
 				 numbersInMaxVertexId = std::log10(graph.size()) + 1;
 
 	for (size_t vertexId(0); vertexId < graph.size(); ++vertexId)
@@ -134,7 +135,7 @@ int main()
 	for (auto &vertexEdgesValues : graph)
 	{
 		vertexEdgesValues.resize(verticesCount);
-		std::generate(vertexEdgesValues.begin(), vertexEdgesValues.end(), []() { return std::rand() % 1000; });
+		std::generate(vertexEdgesValues.begin(), vertexEdgesValues.end(), []() { return std::rand() % 1000 - 100; });
 	}
 
 	for (size_t i(0); i < verticesCount; ++i)

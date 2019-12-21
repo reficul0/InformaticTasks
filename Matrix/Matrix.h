@@ -15,6 +15,7 @@ namespace Matrix
 		size_t _rows;
 		size_t _columns;
 	public:
+		using Ptr = std::shared_ptr<Matrix>;
 		Matrix(size_t rows, size_t columns)
 			: _ptr(nullptr)
 			, _rows(rows)

@@ -29,7 +29,7 @@
 template<
 	template<class> class MatrixType, 
 	typename ElementType,
-	typename = std::enable_if_t<std::is_arithmetic<ElementType>::value> // функция только для матриц с элементами числами
+	typename = std::enable_if_t<std::is_arithmetic<ElementType>::value>
 >
 void RandomElements(MatrixType<ElementType> *mtx)
 {
@@ -72,24 +72,26 @@ void RandomElements(MatrixType<ElementType> *mtx)
 int main(int argc, char *argv[])
 {
 	using ElementType = int;
-	Matrix::Matrix<ElementType>* mtx = new Matrix::SquareMatrix<ElementType>(
-		Matrix::Tools::GetValueFromUser<int64_t>(
-			"Enter the order of the matrix > 0",
-			[](int64_t value) { return value > 0; }
-		)
+	Matrix::Matrix<ElementType>::Ptr mtx;
+	size_t const mtxOrder = Matrix::Tools::GetValueFromUser<int64_t>(
+		"Enter the order of the matrix > 0",
+		[](int64_t const &value) noexcept { return value > 0; }
 	);
-
-	if (mtx != nullptr)
+	try
 	{
-		RandomElements(mtx);
-
-		Demostration::Demonstrator demonstrator;
-		demonstrator.Demonstrate(mtx);
-
-		delete mtx;
+		mtx = std::make_shared< Matrix::SquareMatrix<ElementType>>(mtxOrder);
 	}
-	else
+	catch (std::bad_alloc &)
+	{
 		Log::Error("Memory allocation error.");
+		return -1;
+	}
+
+	RandomElements(mtx.get());
+
+	Demostration::Demonstrator demonstrator;
+	demonstrator.Demonstrate(mtx.get());
+		
 
 	return 0;
 }

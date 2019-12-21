@@ -17,28 +17,30 @@ namespace Demostration
 {
 	class SearchOfMaxElement
 	{
+		template<class ElementType>
+		static bool IsElementAboveSideDiagonal(Matrix::Element<ElementType>& elem) noexcept
+		{
+			return elem.column >= elem.row;
+		}
+		template<class ElementType>
+		static bool MaxElement(Matrix::Element<ElementType>& last, Matrix::Element<ElementType>& second) noexcept
+		{
+			return (*last.value) < (*second.value);
+		};
+
 		template< template<class> class MatrixType, typename ElementType>
 		Matrix::Element<ElementType> _GetMaxElementWithVisualization(MatrixType<ElementType>* mtx)
 		{
 			size_t timeoutBetweenSteps = Matrix::Tools::GetValueFromUser<int64_t>(
 				"Enter timeout between visuzlization steps(msec), recommended 100",
-				[] (int64_t value) { return value > 0; }
+				[] (int64_t const &value) noexcept { return value > 0; }
 			);
-
-			auto elementsUpperSideDiagonalFunction = [mtx](Matrix::Element<ElementType>& elem)
-			{
-				return elem.column >= elem.row;
-			};
-			auto maxElementFunction = [](Matrix::Element<ElementType>& last, Matrix::Element<ElementType>& second)
-			{
-				return (*last.value) < (*second.value);
-			};
 
 			return Matrix::Algorithm::Visualization::FindElement(
 				mtx,
-				elementsUpperSideDiagonalFunction,
+				std::bind(&SearchOfMaxElement::IsElementAboveSideDiagonal<ElementType>, std::placeholders::_1),
 				Log::ansiColorYellow,
-				maxElementFunction,
+				std::bind(&SearchOfMaxElement::MaxElement<ElementType>, std::placeholders::_1, std::placeholders::_2),
 				Log::ansiColorGreen,
 				Log::ansiColorRed,
 				timeoutBetweenSteps
@@ -48,34 +50,44 @@ namespace Demostration
 		template< template<class> class MatrixType, typename ElementType >
 		Matrix::Element<ElementType> _GetMaxElement(MatrixType<ElementType>* mtx)
 		{
-			auto elementsUpperSideDiagonalFunction = [mtx](Matrix::Element<ElementType>& elem)
-			{
-				return elem.column < (mtx->GetRows() - elem.row);
-			};
-			auto maxElementFunction = [](Matrix::Element<ElementType>& last, Matrix::Element<ElementType>& second)
-			{
-				return (*last.value) < (*second.value);
-			};
-
-			return Matrix::Algorithm::FindElement(
+			Matrix::Element<ElementType> element =  Matrix::Algorithm::FindElement(
 				mtx,
-				elementsUpperSideDiagonalFunction,
-				maxElementFunction
+				std::bind(&SearchOfMaxElement::IsElementAboveSideDiagonal<ElementType>, std::placeholders::_1),
+				std::bind(&SearchOfMaxElement::MaxElement<ElementType>, std::placeholders::_1, std::placeholders::_2)
 			);
+
+			Array<Matrix::ElementToVisualize<ElementType>> arr(1);
+			arr[0] = Matrix::ElementToVisualize<ElementType>{ element, Log::ansiColorGreen };
+			Matrix::MatrixVisualizer visualizer;
+			visualizer.Print(mtx);
+			visualizer.Update(
+				mtx,
+				std::bind(&SearchOfMaxElement::IsElementAboveSideDiagonal<ElementType>, std::placeholders::_1),
+				Log::ansiColorYellow,
+				arr
+			);
+
+			return element;
 		}
 
 	public:
 		template< template<class> class MatrixType, typename ElementType >
 		void Demonstrate(MatrixType<ElementType>* mtx)
 		{
-			size_t isVisualizationRequired = 0;
-			printf("\nDo you want to see the visualization of the serach max element algorithm?(1/yes, 0/no) :");
-			scanf("%i", &isVisualizationRequired);
+			char const userChoice = Matrix::Tools::GetValueFromUser<char>(
+				"Do you want to see the visualization of the serach max element algorithm?(y/yes, n/no)",
+				[](char const &value) noexcept { 
+					auto const lowerCaseChar = std::tolower(value);
+					return lowerCaseChar == 'y' || lowerCaseChar == 'n';
+				}
+			);
+			size_t isVisualizationRequired = userChoice == 'y';
 
 			system("cls");
 
-			Matrix::Element<ElementType> maxElem = isVisualizationRequired ? _GetMaxElementWithVisualization(mtx)
-				: _GetMaxElement(mtx);
+			Matrix::Element<ElementType> maxElem = isVisualizationRequired 
+														? _GetMaxElementWithVisualization(mtx)														   
+														: _GetMaxElement(mtx);
 
 			printf("\nMax element upper side diagonal is: %smtx[%i][%i] == ", Log::ansiColorGreen, maxElem.row, maxElem.column);
 			std::cout << *maxElem.value << Log::ansiColorReset << std::endl;
@@ -145,22 +157,11 @@ namespace Demostration
 			return numberOfSymbolsInMaxElement;
 		}
 
-		template<typename ElementType>
-		void Print(Array<ElementType>& arr, size_t maxElementSymbols)
-		{
-			size_t size = arr.GetSize();
-
-			std::cout << "[ ";
-			for (size_t i = 0; i < size; ++i)
-				std::cout << std::setfill(' ') << std::setw(maxElementSymbols) << arr[i] << std::ends << " ";
-			std::cout << " ]" << std::endl;
-		}
-
 		template<template<class> class MatrixType, typename ElementType>
-		MatrixType<ElementType>* TransformMatrixColumns(Array<size_t>& transformColumns, MatrixType<ElementType>* sourceMtx)
+		typename MatrixType<ElementType>::Ptr TransformMatrixColumns(Array<size_t>& transformColumns, MatrixType<ElementType>* sourceMtx)
 		{
 			ElementType tmp;
-			MatrixType<ElementType>* result = new MatrixType<ElementType>(sourceMtx->GetRows(), sourceMtx->GetColumns());
+			typename MatrixType<ElementType>::Ptr result = std::make_shared<MatrixType<ElementType>>(sourceMtx->GetRows(), sourceMtx->GetColumns());
 
 			for (size_t resultColumntId = 0; resultColumntId < transformColumns.GetSize(); ++resultColumntId)
 			{
@@ -191,13 +192,13 @@ namespace Demostration
 				transformColumnsIndexes[column] = column;
 			}
 
-			Quicksort(transformColumnsIndexes, firstRow, 0, columns-1, [](ElementType &first, ElementType &second) {
+			Quicksort(transformColumnsIndexes, firstRow, 0, columns-1, [](ElementType &first, ElementType &second) noexcept {
 				return first < second;
 			});
 
 			system("cls");
 			// ѕолучаем трансформированную матрицу, у которой элементы первой строки идут в возрастающем пор€дке.
-			MatrixType<ElementType> *transformedMtx = TransformMatrixColumns(transformColumnsIndexes, mtx);
+			typename MatrixType<ElementType>::Ptr transformedMtx = TransformMatrixColumns(transformColumnsIndexes, mtx);
 
 			Matrix::MatrixVisualizer visualzer;
 			std::cout << "Matrix before sort:" << std::endl;
@@ -206,11 +207,9 @@ namespace Demostration
 			std::cout << std::endl;
 
 			std::cout << "Matrix after sort:" << std::endl;
-			visualzer.Print(transformedMtx);
+			visualzer.Print(transformedMtx.get());
 
 			system("pause");
-
-			delete transformedMtx;
 		}
 	};
 

@@ -45,8 +45,8 @@ int main()
 {
 	constexpr auto d = Fraction<103>();
 	std::cout << "Calculate 1/(1+ 1/(3+(... + 1/(101 + 1/103) )))";
-	std::cout << "\nCalculation result: " << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << d.calculate << '\n';
-	std::cout << d.numerator << " / " << std::fixed << std::setprecision(std::numeric_limits<double>::digits10) << d.denomirator << '\n';
+	std::cout << "\nCalculation result: " << std::setprecision(std::numeric_limits<double>::digits10) << d.calculate << '\n';
+	std::cout << d.numerator << " / " << std::setprecision(std::numeric_limits<double>::digits10) << d.denomirator << '\n';
 
     return 0;
 }
