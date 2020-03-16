@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <locale>
 #include <Windows.h>
+#include <functional>
 
 #include <experimental/filesystem>
 /*
@@ -68,8 +69,6 @@ int main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	std::vector<Clinic> clinics;
-
 	std::ifstream file("input.txt", std::ifstream::in);
 	if (!file.is_open())
 	{ 
@@ -78,7 +77,7 @@ int main()
 		return -1;
 	}
 
-	std::copy(std::istream_iterator<TransferClinic>(file), std::istream_iterator<TransferClinic>(), std::back_inserter(clinics));
+	auto clinics = std::vector<Clinic>(std::istream_iterator<TransferClinic>(file), std::istream_iterator<TransferClinic>());
 
 	std::string specialistName;
 	std::cout << "Enter any specialization name: ";
