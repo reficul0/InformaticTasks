@@ -16,7 +16,8 @@
 
 #include <experimental/filesystem>
 /*
-10. Каждая поликлиника города должна быть укомплектована врачами различной специализации (окулист, хирург, невропатолог и т.д.), по одному врачу каждой специальности. Составить программу, которая распечатывает по запросу:
+Каждая поликлиника города должна быть укомплектована врачами различной специализации (окулист, хирург, невропатолог и т.д.), 
+по одному врачу каждой специальности. Составить программу, которая распечатывает по запросу:
 | Номер поликлинники |								Штаты									   |
 |					 | Хирург | Окулист | Невролог | Лор | Кардиолог | Эндокринолог | Терапевт |
 
@@ -28,40 +29,26 @@ class Clinic
 public:
 	using EmployeesT = std::map<std::string/*vacancy name*/, size_t/*specialists count*/>;
 
-	template<typename StringT, typename InEmployeesT>
-	Clinic(StringT &&name, InEmployeesT &&employees)
-		: Name(std::forward<StringT>(name))
-		, Employees(std::forward<InEmployeesT>(employees))
-	{
-	}
+	Clinic() = default;
 
-	std::string Name;
-	EmployeesT Employees;
-};
-
-class TransferClinic {
-public:
-	friend std::istream &operator >> (std::istream &in, TransferClinic &dest)
+	friend std::istream& operator>>(std::istream &in, Clinic &dest)
 	{
-		in >> dest.name;
+		if (!dest.Employees.empty()) dest.Employees = {};
+
+		in >> dest.Name;
 
 		while (!in.eof() && (in.peek() != '\n'))
 		{
-			Clinic::EmployeesT::key_type employeeSpecialization;
-			Clinic::EmployeesT::value_type::second_type employeesCount(0);
+			EmployeesT::key_type employeeSpecialization;
+			EmployeesT::value_type::second_type employeesCount(0);
 			in >> employeeSpecialization >> employeesCount;
-			dest.employees.emplace(std::move(employeeSpecialization), employeesCount);
+			dest.Employees.emplace(std::move(employeeSpecialization), employeesCount);
 		}
 		return in;
 	}
 
-	operator Clinic() const {
-		return Clinic( std::move(name), std::move(employees) );
-	}
-
-private:
-	std::string name;
-	Clinic::EmployeesT mutable employees;
+	std::string Name;
+	EmployeesT Employees;
 };
 
 int main()
@@ -77,7 +64,7 @@ int main()
 		return -1;
 	}
 
-	auto clinics = std::vector<Clinic>(std::istream_iterator<TransferClinic>(file), std::istream_iterator<TransferClinic>());
+	auto clinics = std::vector<Clinic>(std::istream_iterator<Clinic>(file), std::istream_iterator<Clinic>());
 
 	std::string specialistName;
 	std::cout << "Enter any specialization name: ";
