@@ -9,7 +9,7 @@
 #include <math.h>
 #include <ctime>
 #include <iterator>
-#include <string_view>
+#include <boost/utility/string_view.hpp>
 #include <functional>
 
 // Вариант 10.
@@ -52,7 +52,7 @@ auto GetZ(XIterT xbegin, XIterT xend, YIterT ybegin, YIterT yend)
 }
 
 template<typename CharT, typename ValueType>
-auto GetValueFromUser(std::basic_string_view<CharT> message, std::function<bool(ValueType&)> const &isValueValid)
+auto GetValueFromUser(boost::basic_string_view<CharT> message, std::function<bool(ValueType&)> const &isValueValid)
 {
 	using namespace std;
 
@@ -83,7 +83,7 @@ auto GetValueFromUser(std::basic_string_view<CharT> message, std::function<bool(
 template<typename CharT, typename ValueType>
 auto GetValueFromUser(CharT const *message, std::function<bool(ValueType&)> const &isValueValid)
 {
-	return GetValueFromUser(std::basic_string_view<CharT>{message}, isValueValid);
+	return GetValueFromUser(boost::basic_string_view<CharT>{message}, isValueValid);
 }
 
 int main()
